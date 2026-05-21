@@ -1,0 +1,8 @@
+{
+  "name": "Taquería El Pastorcito",
+  "description": "Sistema integral de gestión en tiempo real para meseros, cocineros y dueños de una taquería, con análisis de datos inteligente y simulación activa del flujo de trabajo.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
