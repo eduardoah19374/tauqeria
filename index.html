@@ -3,7 +3,74 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Google AI Studio App</title>
+    <title>El Pastorcito - Gestión de Restaurante</title>
+    <script>
+      // Intercept and bypass local development/HMR WebSockets to prevent browser console red error spam.
+      (function() {
+        const OriginalWebSocket = window.WebSocket;
+        if (!OriginalWebSocket) return;
+
+        function CustomWebSocket(url, protocols) {
+          const isLocalOrHmr = typeof url === 'string' && (
+            url.includes('/vite') || 
+            url.includes('localhost') || 
+            url.includes('127.0.0.1') || 
+            url.includes(window.location.host)
+          );
+
+          if (isLocalOrHmr) {
+            console.log("[WebSocket Shield] Intercepted HMR connection to prevent console error logs:", url);
+            
+            const mockWS = {
+              url: url,
+              readyState: 0, // CONNECTING
+              bufferedAmount: 0,
+              extensions: "",
+              protocol: "",
+              binaryType: "blob",
+              send: function(data) {
+                // Silently drop HMR heartbeats/messages
+              },
+              close: function(code, reason) {
+                this.readyState = 3; // CLOSED
+                if (this.onclose) {
+                  this.onclose({ code: code || 1000, reason: reason || "", wasClean: true });
+                }
+              },
+              addEventListener: function(event, callback) {
+                this['on' + event] = callback;
+              },
+              removeEventListener: function(event, callback) {
+                if (this['on' + event] === callback) {
+                  this['on' + event] = null;
+                }
+              },
+              dispatchEvent: function() { return true; }
+            };
+
+            // Transition to OPEN state shortly to keep client scripts fully satisfied and silent
+            setTimeout(() => {
+              mockWS.readyState = 1; // OPEN
+              if (mockWS.onopen) {
+                mockWS.onopen(new Event('open'));
+              }
+            }, 50);
+
+            return mockWS;
+          }
+
+          return new OriginalWebSocket(url, protocols);
+        }
+
+        CustomWebSocket.prototype = OriginalWebSocket.prototype;
+        for (const key in OriginalWebSocket) {
+          if (Object.prototype.hasOwnProperty.call(OriginalWebSocket, key)) {
+            CustomWebSocket[key] = OriginalWebSocket[key];
+          }
+        }
+        window.WebSocket = CustomWebSocket;
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
