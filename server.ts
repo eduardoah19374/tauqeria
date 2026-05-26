@@ -2,7 +2,7 @@ import express from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
-import { Order, Waiter, Cook, OrderItem, TACOS_MENU } from "./src/types.js";
+import { Order, Waiter, Cook, OrderItem, TACOS_MENU } from "./src/types";
 
 // Lazy-initialized Gemini Client
 let aiInstance: GoogleGenAI | null = null;
