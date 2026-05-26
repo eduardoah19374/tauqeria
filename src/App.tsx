@@ -69,8 +69,8 @@ export default function App() {
       setStats(statsData);
       setServerError(null);
     } catch (err: any) {
-      console.warn("Fallo conexion del backend. Operando con estado local offline-first.", err);
-      setServerError("Operando con base de datos local simulada. Levante el servidor tsx para tiempo real.");
+      console.warn("Falloconexion con el backend:", err);
+      setServerError("Conexión perdida con el servidor en tiempo real. Intentando reconectar...");
     } finally {
       if (!silent) setIsRefreshing(false);
     }
@@ -109,17 +109,11 @@ export default function App() {
       if (res.ok) {
         triggerNotification(`¡Mesero ${name} registrado con éxito!`);
         await syncServerEntities(true);
+      } else {
+        triggerNotification("No se pudo agregar el mesero en el servidor.", "info");
       }
     } catch (e) {
-      // Local fallback
-      const mockNew: Waiter = {
-        id: "w-mock-" + Math.random(),
-        name,
-        status: "Activo",
-        ordersCount: 0,
-        totalSales: 0
-      };
-      setWaiters([...waiters, mockNew]);
+      triggerNotification("Error de red: No se pudo registrar el mesero.", "info");
     }
   };
 
@@ -133,16 +127,11 @@ export default function App() {
       if (res.ok) {
         triggerNotification(`¡Chef papitas ${name} agregado a las parrillas!`);
         await syncServerEntities(true);
+      } else {
+        triggerNotification("No se pudo agregar el cocinero en el servidor.", "info");
       }
     } catch (e) {
-      const mockNew: Cook = {
-        id: "c-mock-" + Math.random(),
-        name,
-        status: "Disponible",
-        activeOrdersCount: 0,
-        completedOrdersCount: 0
-      };
-      setCooks([...cooks, mockNew]);
+      triggerNotification("Error de red: No se pudo registrar el cocinero.", "info");
     }
   };
 
